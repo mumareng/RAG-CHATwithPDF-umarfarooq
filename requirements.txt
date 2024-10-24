@@ -5,3 +5,4 @@ huggingface-hub
 faiss-cpu
 transformers
 langchain_community
+torch
