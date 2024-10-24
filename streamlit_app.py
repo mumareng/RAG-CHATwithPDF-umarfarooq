@@ -7,7 +7,7 @@ st.write(
 
 
 import streamlit as st
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+
 from PyPDF2 import PdfReader
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
