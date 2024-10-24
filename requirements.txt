@@ -6,3 +6,4 @@ faiss-cpu
 transformers
 langchain_community
 torch
+sentence-transformers
