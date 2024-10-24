@@ -9,7 +9,11 @@ st.write(
 import streamlit as st
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from PyPDF2 import PdfReader
-from langchain.embeddings import HuggingFaceEmbeddings
+try:
+    from langchain.embeddings import HuggingFaceEmbeddings
+    print("HuggingFaceEmbeddings imported successfully!")
+except ModuleNotFoundError:
+    print("HuggingFaceEmbeddings not found.")
 from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain.llms import OpenAI
