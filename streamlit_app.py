@@ -169,8 +169,7 @@
 
 import streamlit as st
 import os
-import torch  # Add this line to import the torch library
-
+import torch  
 # Set the title and introduction
 st.title("RAG")
 st.write(
