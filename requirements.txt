@@ -1,6 +1,4 @@
 streamlit
 openai
-langcahin
-transformer
+langchain
 PyPDF2
-FAISS
