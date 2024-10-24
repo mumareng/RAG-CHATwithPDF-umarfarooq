@@ -7,7 +7,7 @@ st.write(
 
 
 import streamlit as st
-
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from PyPDF2 import PdfReader
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
@@ -26,7 +26,7 @@ openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key (required)", t
 if openai_api_key:
     os.environ["OPENAI_API_KEY"] = openai_api_key
 
-html_temp = """
+html_temp = f"""
  <div style="position: fixed;text-align: center; top: 0; right: 0; width: 70%; height: auto;background-color:white;  padding: 10px; border-bottom: solid 1px #e0e0e0; z-index: 1000;">
    <h1 style="text-align: center; margin-top: 30px; color: black;">
      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIag-4EEBF1dYQ31wn5YTLj7mVZHThEJ0jvhwUdvjJTmTDXK79vSDnUdA_tyIW1tW8xbE&usqp=CAU" alt="Chat PDF" width="100" style="vertical-align: middle;"/> RAG BASED CHATPDF
@@ -148,6 +148,6 @@ if uploaded_file is not None:
 
             st.write("")  # Add a blank line for spacing
 
-# Close the content div at the end of your main code
+
 st.markdown("</div>", unsafe_allow_html=True)
 
