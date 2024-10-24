@@ -169,61 +169,45 @@
 
 import streamlit as st
 import os
-import torch  
-# Set the title and introduction
+import torch
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from PyPDF2 import PdfReader
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.chains import RetrievalQA
+from langchain.llms import OpenAI
+
+# Set the title and introductory text for the Streamlit app
 st.title("RAG")
 st.write(
     "Let's start building! For help and inspiration, head over to [docs.streamlit.io](https://docs.streamlit.io/)."
 )
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from PyPDF2 import PdfReader
-
-try:
-    from langchain.embeddings import HuggingFaceEmbeddings
-    print("HuggingFaceEmbeddings imported successfully!")
-except ModuleNotFoundError:
-    print("HuggingFaceEmbeddings not found.")
-
-try:
-    from langchain.vectorstores import FAISS
-    print("FAISS imported successfully!")
-except ModuleNotFoundError:
-    print("FAISS not found.")
-
-from langchain.chains import RetrievalQA
-
-try:
-    from langchain.llms import OpenAI
-    print("OpenAI imported successfully!")
-except ModuleNotFoundError:
-    print("OpenAI not found in langchain.llms.")
-
 # Maximum number of free questions
-MAX_QUESTIONS = 2  # Change as needed for testing or production
+MAX_QUESTIONS = 2  # Change to 2 for testing
 
-# Sidebar for API key input
+# Add a section in the sidebar for the user to input the OpenAI API key
 st.sidebar.header("API Key")
 openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key (required)", type="password")
 
-# Set OpenAI API key as an environment variable if provided
+# If the OpenAI API key is provided, set it in the environment variable
 if openai_api_key:
     os.environ["OPENAI_API_KEY"] = openai_api_key
 
-# HTML template for the navbar
+# Fixed navbar with branding
 html_temp = f"""
- <div style="position: fixed;text-align: center; top: 0; right: 0; width: 70%; height: auto;background-color:white;  padding: 10px; border-bottom: solid 1px #e0e0e0; z-index: 1000;">
+<div style="position: fixed; text-align: center; top: 0; right: 0; width: 70%; height: auto; background-color: white; padding: 10px; border-bottom: solid 1px #e0e0e0; z-index: 1000;">
    <h1 style="text-align: center; margin-top: 30px; color: black;">
      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIag-4EEBF1dYQ31wn5YTLj7mVZHThEJ0jvhwUdvjJTmTDXK79vSDnUdA_tyIW1tW8xbE&usqp=CAU" alt="Chat PDF" width="100" style="vertical-align: middle;"/> RAG BASED CHATPDF
    </h1>
    <p style="text-align: center; font-size: 20px; color: #3498db;">CHAT WITH PDF</p>
-   <p style="text-align: center; color: black;">
-     <a href="https://www.linkedin.com/in/muhammad-umar-farooq-85b497237/" target="_blank" style="color:  #3498db; text-decoration: none;">
-       Developed by <strong>Muhammad Umar Farooq </strong>
-     </a>
-   </p>
- </div>
- <div style="margin-top: 150px; margin-bottom: 15px;"></br></br></br>
+   <p style="text-align: center; color: black;"><a href="https://www.linkedin.com/in/muhammad-umar-farooq-85b497237/" target="_blank" style="color: #3498db; text-decoration: none;">
+    Developed by <strong>Muhammad Umar Farooq</strong>
+  </a></p>
+</div>
+<div style="margin-top: 150px; margin-bottom: 15px;"> 
+</br>
+</br></br>
 """
 
 # Add the fixed navbar to the Streamlit app
@@ -246,8 +230,8 @@ if uploaded_file is not None:
     pdf_text = ""
 
     # Extract text from each page
-    for page in pdf_reader.pages:
-        pdf_text += page.extract_text() or ""  # Use or "" to handle None values
+    for page_num, page in enumerate(pdf_reader.pages):
+        pdf_text += page.extract_text() or ""
 
     # Split the extracted text into chunks
     def split_text(text):
@@ -257,20 +241,23 @@ if uploaded_file is not None:
     text_chunks = split_text(pdf_text)
 
     # Generate embeddings using HuggingFace
-    embedding_model = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-small-en-v1.5",
-        model_kwargs={"device": "cuda" if torch.cuda.is_available() else "cpu"}  # Specify device
-    )
-    embeddings = embedding_model.embed_documents(text_chunks)
+    try:
+        embedding_model = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
+        embeddings = embedding_model.embed_documents(text_chunks)
+    except ImportError as e:
+        st.error(f"Failed to load HuggingFaceEmbeddings: {str(e)}")
 
     # Store embeddings in FAISS vector store
     vector_store = FAISS.from_texts(text_chunks, embedding_model)
 
     # Setup the OpenAI-based QA chain if API key is available
     if 'OPENAI_API_KEY' in os.environ:
-        llm = OpenAI(temperature=0)
-        retriever = vector_store.as_retriever(search_type="mmr")  # Use MMR for retrieval
-        qa_chain = RetrievalQA.from_chain_type(llm=llm, retriever=retriever)
+        try:
+            llm = OpenAI(temperature=0)
+            retriever = vector_store.as_retriever(search_type="mmr")  # Use MMR for retrieval
+            qa_chain = RetrievalQA.from_chain_type(llm=llm, retriever=retriever)
+        except Exception as e:
+            st.error(f"Failed to set up the QA chain: {str(e)}")
 
     # Display the extracted text in the right sidebar
     st.sidebar.write("### PDF Content:")
@@ -291,7 +278,7 @@ if uploaded_file is not None:
                 result = f"The document contains: {query}"
             else:
                 st.write("### Retrieving relevant information...")
-                result = "OpenAI API required for retrieval"  # Handle without OpenAI
+                result = "OpenAI API required for retrieval."  # Handle without OpenAI
 
             # Store the question and answer in session state
             st.session_state.qa_history.append((query, result))
@@ -317,8 +304,9 @@ if uploaded_file is not None:
     # Display the history of questions and answers in descending order
     if st.session_state.qa_history:
         st.write("### Question and Answer History:")
+
         # Iterate over the history in reverse order for descending display
-        for question, answer in reversed(st.session_state.qa_history):
+        for idx, (question, answer) in reversed(list(enumerate(st.session_state.qa_history))):
             # Display user image and question
             col1, col2 = st.columns([1, 9])  # Create two columns
             with col1:
