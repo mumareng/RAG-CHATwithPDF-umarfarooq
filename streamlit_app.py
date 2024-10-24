@@ -21,7 +21,12 @@ except ModuleNotFoundError:
     print("FAISS not found.")
 
 from langchain.chains import RetrievalQA
-from langchain.llms import OpenAI
+try:
+    from langchain.llms import OpenAI
+    print("OpenAI imported successfully!")
+except ModuleNotFoundError:
+    print("OpenAI not found in langchain.llms.")
+
 import os
 
 # Maximum number of free questions
