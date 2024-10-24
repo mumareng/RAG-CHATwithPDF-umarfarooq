@@ -1,5 +1,5 @@
 streamlit
-openai
 langchain
 PyPDF2
-Huggingface
+huggingface-hub
+faiss-cpu
