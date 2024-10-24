@@ -14,7 +14,12 @@ try:
     print("HuggingFaceEmbeddings imported successfully!")
 except ModuleNotFoundError:
     print("HuggingFaceEmbeddings not found.")
-from langchain.vectorstores import FAISS
+try:
+    from langchain.vectorstores import FAISS
+    print("FAISS imported successfully!")
+except ModuleNotFoundError:
+    print("FAISS not found.")
+
 from langchain.chains import RetrievalQA
 from langchain.llms import OpenAI
 import os
