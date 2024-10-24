@@ -1,1 +1,6 @@
 streamlit
+openai
+langcahin
+transformer
+PyPDF2
+FAISS
