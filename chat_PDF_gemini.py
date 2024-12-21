@@ -8,10 +8,7 @@ from langchain.vectorstores import FAISS
 import google.generativeai as genai
 
 # Set the title and introductory text for the Streamlit app
-st.title("RAG with Gemini")
-st.write(
-    "Let's start building! For help and inspiration, head over to [docs.streamlit.io](https://docs.streamlit.io/)."
-)
+
 
 # Maximum number of free questions
 MAX_QUESTIONS = 15  # Change to 2 for testing
