@@ -7,3 +7,4 @@ transformers
 langchain_community
 torch
 sentence-transformers
+google-generativeai
