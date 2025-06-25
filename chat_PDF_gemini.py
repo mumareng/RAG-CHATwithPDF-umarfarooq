@@ -19,7 +19,7 @@ if gemini_api_key:
 
 # Fixed top navbar
 html_temp = """
-<div style="position: fixed; text-align: center; top: 0; right: 0; width: 70%; height: auto; background-color: white; padding: 10px; border-bottom: solid 1px #e0e0e0; z-index: 1000;">
+<div style="position: variable; text-align: center; top: 0; right: 0; width: 70%; height: auto; background-color: white; padding: 10px; border-bottom: solid 1px #e0e0e0; z-index: 1000;">
    <h1 style="text-align: center; margin-top: 30px; color: black;">
      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIag-4EEBF1dYQ31wn5YTLj7mVZHThEJ0jvhwUdvjJTmTDXK79vSDnUdA_tyIW1tW8xbE&usqp=CAU" alt="Chat PDF" width="100" style="vertical-align: middle;"/> RAG BASED CHATPDF
    </h1>
